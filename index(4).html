@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>bobos</title>
+<style>
+:root{--ink:#14181f;--mut:#7a8494;--line:#e3e7ee;--bg:#eef1f6;--acc:#4f5bd5;--card:#fff;--inp:#fafbfd;color-scheme:light}
+:root[data-theme=dark]{--ink:#e8ebf2;--mut:#8b95a7;--line:#2a3140;--bg:#0f131a;--card:#171c26;--inp:#1f2532;color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+.hide{display:none!important}
+#auth{height:100%;display:grid;place-items:center;padding:20px}
+.box,dialog form{width:100%;max-width:340px;background:var(--card);padding:28px;border-radius:16px;display:grid;gap:12px;box-shadow:0 8px 30px #1b2a4a18}
+.logo{font-size:36px;font-weight:800;letter-spacing:-1.5px;color:var(--acc)}
+.box input,dialog input{padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:var(--inp)}
+.pri{background:var(--acc);color:#fff;padding:11px;border-radius:10px;font-weight:600}
+.lnk{color:var(--acc);font-size:14px}
+.err{color:#c93a3a;font-size:13px;min-height:18px}
+dialog{border:0;border-radius:16px;margin:auto;padding:0;background:none;color:var(--ink)}
+dialog::backdrop{background:#0006}
+dialog form{box-shadow:none;max-height:90vh;overflow:auto}
+#app{display:grid;grid-template-columns:340px 1fr;height:100%}
+aside{background:var(--card);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.top{padding:12px;display:grid;gap:10px;border-bottom:1px solid var(--line)}
+.acct{display:flex;justify-content:space-between;align-items:center}
+.acct b{font-size:20px;letter-spacing:-.5px;color:var(--acc)}
+.acct>span{display:flex;gap:12px;align-items:center;color:var(--mut);font-size:13px}
+.al{max-height:50vh;overflow:auto;display:grid}
+.ar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.top input{padding:9px 12px;border:1px solid var(--line);border-radius:20px;background:var(--bg)}
+#list{overflow:auto;flex:1;padding:6px}
+.it{display:flex;gap:11px;align-items:center;width:100%;padding:9px;border-radius:12px;text-align:left}
+.it:hover{background:var(--bg)}
+.it.on{background:var(--acc);color:#fff}
+.it.on span,.it.on time{color:#ffffffc8}
+.tx{flex:1;min-width:0;display:grid}
+.tx span{color:var(--mut);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt{display:flex;flex-direction:column;align-items:flex-end;gap:4px;align-self:stretch}
+.rt time{color:var(--mut);font-size:12px}
+.bd{background:var(--acc);color:#fff;border-radius:10px;min-width:20px;padding:0 6px;font-size:12px;font-weight:700;text-align:center}
+.it.on .bd{background:#fff;color:var(--acc)}
+.av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;flex:none}
+.none{padding:18px;color:var(--mut);text-align:center}
+main{display:flex;flex-direction:column;min-height:0;min-width:0}
+header{display:flex;align-items:center;gap:11px;padding:10px 14px;background:var(--card);border-bottom:1px solid var(--line)}
+header .av{width:38px;height:38px}
+#back{display:none;font-size:26px;color:var(--acc);padding:0 6px}
+#msgs{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:5px}
+.m{max-width:min(78%,520px);padding:7px 11px;border-radius:14px 14px 14px 4px;background:var(--card);align-self:flex-start;overflow-wrap:anywhere}
+.m.me{align-self:flex-end;background:var(--acc);color:#fff;border-radius:14px 14px 4px 14px}
+.m .who{display:block;font-size:12px;font-weight:700;color:var(--acc)}
+.m time{margin-left:8px;font-size:11px;opacity:.6;white-space:nowrap}
+#f{display:flex;gap:8px;padding:10px 14px;background:var(--card);border-top:1px solid var(--line)}
+#t{flex:1;padding:11px 15px;border:1px solid var(--line);border-radius:22px;background:var(--bg)}
+#f .pri{border-radius:22px;padding:0 20px}
+hr{border:0;border-top:1px solid var(--line);width:100%}
+.mut{color:var(--mut);font-size:13px}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{flex:1;padding:8px;color:var(--ink)}
+.seg button.on{background:var(--acc);color:#fff}
+.sw{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sw button{width:30px;height:30px;border-radius:50%}
+.sw button.on{outline:3px solid var(--ink);outline-offset:2px}
+.sw input{padding:0;border:0;width:30px;height:30px;background:none;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--acc);color:#fff;border-radius:14px;padding:3px 10px;font-size:13px}
+.ht{display:grid;line-height:1.2}
+.ht small{color:var(--mut);font-size:12px}
+#ng{justify-self:start}
+.av img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.avrow{display:flex;gap:14px;align-items:center}
+.avrow .col{display:grid;gap:4px;justify-items:start}
+.avrow .av{width:64px;height:64px;font-size:26px}
+@media(max-width:700px){
+ #app{grid-template-columns:1fr}
+ main{display:none}
+ #app.open aside{display:none}
+ #app.open main{display:flex}
+ #back{display:block}
+}
+</style>
+</head>
+<body>
+
+<div id="auth">
+  <form class="box" id="af">
+    <div class="logo">bobos</div>
+    <input id="lg" placeholder="Логин" autocomplete="username" required>
+    <input id="pw" type="password" placeholder="Пароль" autocomplete="current-password" required>
+    <div class="err" id="err"></div>
+    <button class="pri" id="go">Войти</button>
+    <button type="button" class="lnk" id="sw">Нет аккаунта? Создать</button>
+  </form>
+</div>
+
+<div id="app" class="hide">
+  <aside>
+    <div class="top">
+      <div class="acct"><b>bobos</b><span><button class="lnk" id="me" title="Профиль"></button><button class="lnk hide" id="ad">Админка</button><button class="lnk" id="out">Выйти</button></span></div>
+      <input id="q" placeholder="Поиск по username или ID" autocomplete="off">
+      <button class="lnk" id="ng" type="button">＋ Новая группа</button>
+    </div>
+    <div id="list"></div>
+  </aside>
+  <main>
+    <header id="hd"><button id="back" aria-label="Назад">‹</button><div id="hav"></div><div class="ht"><b id="ttl"></b><small id="sub"></small></div></header>
+    <div id="msgs"></div>
+    <form id="f"><input id="t" placeholder="Сообщение" maxlength="2000" autocomplete="off"><button class="pri">Отправить</button></form>
+  </main>
+</div>
+
+<dialog id="dlg">
+  <form id="pf">
+    <b>Настройки</b>
+    <div>ID: <b id="pid"></b> · Статус: <b id="pst"></b></div>
+    <div class="avrow"><div id="mav"></div><div class="col"><button type="button" class="lnk" id="avb">Загрузить фото</button><button type="button" class="lnk" id="avd">Убрать</button></div><input type="file" id="avf" accept="image/*" hidden></div>
+    <input id="nu" placeholder="username" maxlength="20" autocomplete="off">
+    <div class="err" id="perr">Латиница, цифры и _ (3–20 символов)</div>
+    <button class="pri">Сохранить username</button>
+    <hr>
+    <b>Кастомизация</b>
+    <div class="mut">Тема</div>
+    <div class="seg" id="th"><button type="button" data-v="auto">Авто</button><button type="button" data-v="light">Светлая</button><button type="button" data-v="dark">Тёмная</button></div>
+    <div class="mut">Акцентный цвет</div>
+    <div class="sw" id="sw2"></div>
+    <button type="button" class="lnk" id="pc">Закрыть</button>
+  </form>
+</dialog>
+
+<dialog id="gd">
+  <form id="gf">
+    <b>Новая группа</b>
+    <input id="gt" placeholder="Название группы" maxlength="40" autocomplete="off">
+    <div class="chips" id="gs"></div>
+    <input id="gq" placeholder="Добавить: username или ID" autocomplete="off">
+    <div class="al" id="gr"></div>
+    <div class="err" id="gerr"></div>
+    <button class="pri">Создать</button>
+    <button type="button" class="lnk" id="gc">Отмена</button>
+  </form>
+</dialog>
+
+<dialog id="gi">
+  <form method="dialog">
+    <b id="git"></b>
+    <div class="al" id="gil"></div>
+    <button class="lnk">Закрыть</button>
+  </form>
+</dialog>
+
+<dialog id="adm">
+  <form id="af2">
+    <b>Админка: доверенные пользователи</b>
+    <div class="al" id="al"></div>
+    <button type="button" class="lnk" id="ac">Закрыть</button>
+  </form>
+</dialog>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+import {initializeFirestore,collection,doc,setDoc,addDoc,getDoc,getDocs,updateDoc,runTransaction,writeBatch,query,where,orderBy,limit,limitToLast,onSnapshot,serverTimestamp} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+const app=initializeApp({
+  apiKey:"AIzaSyCwsNo4Xk9kT2ZjgnRIh5L4pbt8d-A9o1Y",
+  authDomain:"bobos-14e75.firebaseapp.com",
+  projectId:"bobos-14e75",
+  storageBucket:"bobos-14e75.firebasestorage.app",
+  messagingSenderId:"752382858385",
+  appId:"1:752382858385:web:c81d808d578f3c7943db30"
+});
+const auth=getAuth(app),db=initializeFirestore(app,{experimentalAutoDetectLongPolling:true});
+
+const $=s=>document.querySelector(s);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const hue=s=>Math.abs([...s].reduce((a,c)=>(a*31+c.charCodeAt(0))|0,7))%360;
+const av=(n,src)=>{
+  if(src){const a=el('div','av'),i=el('img');i.src=src;i.alt='';a.append(i);return a}
+  const a=el('div','av',n[0].toUpperCase());a.style.background=`hsl(${hue(n)} 50% 52%)`;return a;
+};
+const hm=t=>t?t.toDate().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'}):'';
+const UN=/^[a-z0-9_]{3,20}$/,ADMIN=1000;
+
+let me=null,cur=null,chats=[],unMsgs=null,unChats=null,reg=false;
+let unread={},ac=null,asked=false;
+const ucd={};
+function loadUser(uid){
+  return ucd[uid]?Promise.resolve(ucd[uid]):getDoc(doc(db,'users',uid)).then(s=>ucd[uid]=s.data()||{}).catch(()=>({}));
+}
+
+/* ---------- тема и акцентный цвет ---------- */
+const ACC=['#4f5bd5','#2f80ed','#14b8a6','#27ae60','#f2994a','#e84393','#8e44ad','#e5484d'];
+let pref={theme:'auto',accent:ACC[0]};
+try{Object.assign(pref,JSON.parse(localStorage.getItem('bobos-pref')||'{}'))}catch{}
+const mq=matchMedia('(prefers-color-scheme: dark)');
+function applyPrefs(){
+  const dark=pref.theme==='dark'||(pref.theme==='auto'&&mq.matches);
+  document.documentElement.dataset.theme=dark?'dark':'light';
+  document.documentElement.style.setProperty('--acc',pref.accent);
+  document.querySelectorAll('#th button').forEach(b=>b.classList.toggle('on',b.dataset.v===pref.theme));
+  document.querySelectorAll('#sw2 button').forEach(b=>b.classList.toggle('on',b.dataset.c===pref.accent));
+  $('#cc').value=pref.accent;
+  try{localStorage.setItem('bobos-pref',JSON.stringify(pref))}catch{}
+}
+$('#th').onclick=e=>{const v=e.target.dataset.v;if(v){pref.theme=v;applyPrefs()}};
+ACC.forEach(c=>{
+  const b=el('button');b.type='button';b.dataset.c=c;b.style.background=c;
+  b.onclick=()=>{pref.accent=c;applyPrefs()};$('#sw2').append(b);
+});
+const cc=el('input');cc.type='color';cc.id='cc';cc.title='Свой цвет';
+cc.oninput=()=>{pref.accent=cc.value;applyPrefs()};$('#sw2').append(cc);
+mq.addEventListener('change',applyPrefs);
+applyPrefs();
+
+/* ---------- уведомления (пока открыта вкладка) ---------- */
+document.addEventListener('click',()=>{
+  if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();
+  if(!asked&&'Notification' in window&&Notification.permission==='default'){asked=true;Notification.requestPermission()}
+});
+function beep(){try{const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=880;g.gain.value=.06;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+.12)}catch{}}
+function badge(){const n=Object.values(unread).reduce((a,b)=>a+b,0);document.title=(n?`(${n}) `:'')+'bobos'}
+function notify(id,title,text){
+  if(cur?.id===id&&!document.hidden) return;
+  unread[id]=(unread[id]||0)+1;badge();if(!$('#q').value)renderList();beep();
+  if(document.hidden&&'Notification' in window&&Notification.permission==='granted'){
+    const n=new Notification(title,{body:text,tag:id});n.onclick=()=>{window.focus();n.close()};
+  }
+}
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden&&cur){delete unread[cur.id];badge();if(!$('#q').value)renderList()}
+});
+
+/* ---------- вход ---------- */
+$('#sw').onclick=()=>{
+  reg=!reg;
+  $('#go').textContent=reg?'Создать аккаунт':'Войти';
+  $('#sw').textContent=reg?'Уже есть аккаунт? Войти':'Нет аккаунта? Создать';
+  $('#err').textContent='';
+};
+$('#af').onsubmit=async e=>{
+  e.preventDefault();
+  const l=$('#lg').value.trim().toLowerCase(),p=$('#pw').value,err=$('#err');
+  if(!UN.test(l)) return err.textContent='Логин: 3–20 символов, латиница, цифры и _';
+  err.textContent='Подождите…';
+  try{
+    const em=l+'@bobos.app';
+    if(reg) await createUserWithEmailAndPassword(auth,em,p);
+    else await signInWithEmailAndPassword(auth,em,p);
+  }catch(x){
+    err.textContent=({
+      'auth/email-already-in-use':'Логин занят',
+      'auth/invalid-credential':'Неверный логин или пароль',
+      'auth/weak-password':'Пароль минимум 6 символов',
+      'auth/operation-not-allowed':'В Firebase не включён Email/Password',
+      'auth/too-many-requests':'Слишком много попыток, подожди немного'
+    })[x.code]||x.code;
+  }
+};
+$('#out').onclick=()=>signOut(auth);
+
+/* ---------- профиль: числовой ID и username ---------- */
+async function ensureProfile(u){
+  const login=u.email.split('@')[0],ref=doc(db,'users',u.uid);
+  const p=(await getDoc(ref)).data()||{};
+  if(!p.bobosId){
+    const cref=doc(db,'meta','counter');
+    p.bobosId=await runTransaction(db,async t=>{
+      const c=await t.get(cref),id=c.exists()?c.data().n+1:1000;
+      t.set(cref,{n:id});
+      t.set(ref,{bobosId:id,name:login},{merge:true});
+      return id;
+    });
+  }
+  if(!p.username){
+    let un=login;
+    for(let i=0;i<6;i++){
+      try{
+        const b=writeBatch(db);
+        b.set(doc(db,'usernames',un),{uid:u.uid});
+        b.set(ref,{username:un,usernameLower:un},{merge:true});
+        await b.commit();p.username=un;break;
+      }catch{un=login+(100+Math.floor(Math.random()*900))}
+    }
+  }
+  return p;
+}
+$('#me').onclick=()=>{$('#pst').textContent=me.id===ADMIN?'Админ':me.trusted?'Доверенный ✓':'Обычный';$('#pid').textContent=me.id;$('#mav').replaceChildren(av(me.username,me.avatar));$('#nu').value=me.username;$('#dlg').showModal()};
+$('#pc').onclick=()=>$('#dlg').close();
+$('#pf').onsubmit=async e=>{
+  e.preventDefault();
+  const n=$('#nu').value.trim().toLowerCase(),er=$('#perr');
+  if(n===me.username) return $('#dlg').close();
+  if(!UN.test(n)) return er.textContent='Латиница, цифры и _ (3–20 символов)';
+  try{
+    const b=writeBatch(db);
+    b.delete(doc(db,'usernames',me.username));
+    b.set(doc(db,'usernames',n),{uid:me.uid});
+    b.set(doc(db,'users',me.uid),{username:n,usernameLower:n},{merge:true});
+    await b.commit();
+    me.username=n;$('#me').textContent='@'+n;$('#dlg').close();
+  }catch{er.textContent='Не получилось: username занят или нет связи'}
+};
+
+/* ---------- аватарка ---------- */
+function toAvatar(file){
+  return new Promise((res,rej)=>{
+    const img=new Image(),u=URL.createObjectURL(file);
+    img.onload=()=>{
+      const S=128,c=document.createElement('canvas');c.width=c.height=S;
+      const m=Math.min(img.width,img.height);
+      c.getContext('2d').drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,S,S);
+      URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',.8));
+    };
+    img.onerror=()=>rej(new Error('bad image'));
+    img.src=u;
+  });
+}
+async function saveAvatar(data){
+  try{
+    await setDoc(doc(db,'users',me.uid),{avatar:data},{merge:true});
+    me.avatar=data;ucd[me.uid]={...ucd[me.uid],avatar:data};
+    $('#mav').replaceChildren(av(me.username,data));
+  }catch(x){$('#perr').textContent='Не сохранилось: '+(x.code||x.message)}
+}
+$('#avb').onclick=()=>$('#avf').click();
+$('#avd').onclick=()=>saveAvatar(null);
+$('#avf').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';
+  if(!f) return;
+  try{await saveAvatar(await toAvatar(f))}catch{$('#perr').textContent='Не получилось открыть картинку'}
+};
+
+/* ---------- админка (ID 1000) ---------- */
+$('#ac').onclick=()=>$('#adm').close();
+$('#ad').onclick=()=>{$('#adm').showModal();loadAdmin()};
+async function loadAdmin(){
+  const box=$('#al');box.replaceChildren(el('div','none','Загрузка…'));
+  const s=await getDocs(query(collection(db,'users'),limit(200)));
+  box.replaceChildren();
+  const us=s.docs.filter(d=>d.id!==me.uid&&d.data().username);
+  if(!us.length) return box.append(el('div','none','Других пользователей пока нет'));
+  us.forEach(d=>{
+    const u=d.data(),r=el('div','ar'),t=el('div','tx');
+    t.append(el('b',0,'@'+u.username+(u.trusted?' ✓':'')),el('span',0,'ID '+u.bobosId));
+    const b=el('button','lnk',u.trusted?'Снять доверие':'Сделать доверенным');
+    b.onclick=async()=>{
+      b.disabled=true;
+      try{await updateDoc(doc(db,'users',d.id),{trusted:!u.trusted})}catch(x){alert('Не вышло: '+x.code)}
+      loadAdmin();
+    };
+    r.append(t,b);box.append(r);
+  });
+}
+
+/* ---------- список чатов ---------- */
+function item(title,sub,time,on,click,n,src){
+  const b=el('button','it'+(on?' on':''));b.type='button';
+  const t=el('div','tx');t.append(el('b',0,title),el('span',0,sub));
+  const r=el('div','rt');r.append(el('time',0,time));
+  if(n) r.append(el('i','bd',n));
+  b.append(av(title,src),t,r);b.onclick=click;return b;
+}
+const ms=c=>c.lastTs?.toMillis?.()??Date.now();
+function dm(c){
+  if(c.type==='group') return {title:c.title||'Группа',meta:{members:c.members,names:c.names,group:true,title:c.title}};
+  const other=c.members.find(x=>x!==me.uid);
+  return {title:c.names?.[other]||'Диалог',other,meta:{members:c.members,names:c.names}};
+}
+function renderList(){
+  const box=$('#list');box.replaceChildren();
+  if(!chats.length) box.append(el('div','none','Диалогов пока нет. Найди человека по username или ID.'));
+  [...chats].sort((a,b)=>ms(b)-ms(a)).forEach(c=>{
+    const d=dm(c);
+    box.append(item(d.title,(c.type==='group'&&c.lastFrom?c.lastFrom+': ':'')+(c.lastText||''),hm(c.lastTs),cur?.id===c.id,()=>openChat(c.id,d.title,d.meta,true),unread[c.id],ucd[d.other]?.avatar));
+  });
+}
+
+/* ---------- поиск: username или ID ---------- */
+async function findUsers(q){
+  const users=collection(db,'users');
+  const qq=/^\d+$/.test(q)
+    ? query(users,where('bobosId','==',Number(q)),limit(8))
+    : query(users,where('usernameLower','>=',q),where('usernameLower','<=',q+'\uf8ff'),limit(8));
+  return (await getDocs(qq)).docs.filter(d=>d.id!==me.uid&&d.data().username);
+}
+let st;
+$('#q').oninput=e=>{
+  clearTimeout(st);
+  const q=e.target.value.trim().toLowerCase().replace(/^@/,'');
+  if(!q) return renderList();
+  st=setTimeout(async()=>{
+    const us=await findUsers(q);
+    const box=$('#list');box.replaceChildren();
+    if(!us.length) return box.append(el('div','none','Никого не нашли'));
+    us.forEach(d=>{
+      const u=d.data();
+      box.append(item(u.username+(u.trusted?' ✓':''),'ID '+u.bobosId,'',false,()=>{
+        $('#q').value='';
+        const members=[me.uid,d.id].sort();
+        openChat(members.join('_'),u.username,{members,names:{[me.uid]:me.username,[d.id]:u.username}},true);
+      },0,u.avatar));
+    });
+  },250);
+};
+
+/* ---------- переписка ---------- */
+function openChat(id,title,meta,show){
+  cur={id,title,meta};
+  delete unread[id];badge();
+  unMsgs&&unMsgs();
+  $('#ttl').textContent=title;
+  $('#hav').replaceChildren(av(title,meta.group?null:ucd[meta.members.find(x=>x!==me.uid)]?.avatar));
+  $('#sub').textContent=meta.group?meta.members.length+' участн.':'';
+  if(!meta.group){
+    const other=meta.members.find(x=>x!==me.uid);
+    loadUser(other).then(u=>{
+      if(cur?.id!==id) return;
+      if(u.trusted) $('#ttl').textContent=title+' ✓';
+      if(u.avatar) $('#hav').replaceChildren(av(title,u.avatar));
+    });
+  }
+  $('#msgs').replaceChildren();
+  $('#f').classList.remove('hide');
+  if(show) $('#app').classList.add('open');
+  renderList();
+  unMsgs=onSnapshot(query(collection(db,'chats',id,'messages'),orderBy('ts'),limitToLast(100)),s=>{
+    const box=$('#msgs');box.replaceChildren();
+    s.docs.forEach(d=>{
+      const m=d.data(),mine=m.from===me.uid;
+      const b=el('div','m'+(mine?' me':''));
+      if(!mine&&meta.group) b.append(el('span','who',m.name));
+      b.append(el('span',0,m.text),el('time',0,hm(m.ts)));
+      box.append(b);
+    });
+    box.scrollTop=box.scrollHeight;
+  },console.error);
+}
+$('#back').onclick=()=>$('#app').classList.remove('open');
+function emptyView(){
+  cur=null;unMsgs&&unMsgs();unMsgs=null;
+  $('#ttl').textContent='';$('#sub').textContent='';$('#hav').replaceChildren();
+  $('#msgs').replaceChildren(el('div','none','Выбери диалог слева или найди человека по username или ID.'));
+  $('#f').classList.add('hide');
+}
+
+$('#f').onsubmit=async e=>{
+  e.preventDefault();
+  const i=$('#t'),text=i.value.trim();
+  if(!text||!cur) return;
+  i.value='';
+  try{
+    const upd={lastText:text.slice(0,80),lastFrom:me.username,lastUid:me.uid,lastTs:serverTimestamp()};
+    if(cur.meta.group) upd.names={[me.uid]:me.username};
+    else Object.assign(upd,{members:cur.meta.members,names:{...cur.meta.names,[me.uid]:me.username}});
+    await setDoc(doc(db,'chats',cur.id),upd,{merge:true});
+    await addDoc(collection(db,'chats',cur.id,'messages'),{from:me.uid,name:me.username,text,ts:serverTimestamp()});
+  }catch(x){console.error(x);alert('Не отправилось: '+x.code)}
+};
+
+/* ---------- группы ---------- */
+let gSel={},gt;
+function gChips(){
+  const b=$('#gs');b.replaceChildren();
+  Object.entries(gSel).forEach(([id,n])=>{
+    const c=el('button','chip',n+' ✕');c.type='button';
+    c.onclick=()=>{delete gSel[id];gChips()};b.append(c);
+  });
+}
+$('#ng').onclick=()=>{
+  gSel={};$('#gt').value='';$('#gq').value='';$('#gr').replaceChildren();$('#gerr').textContent='';
+  gChips();$('#gd').showModal();
+};
+$('#gc').onclick=()=>$('#gd').close();
+$('#gq').oninput=e=>{
+  clearTimeout(gt);
+  const q=e.target.value.trim().toLowerCase().replace(/^@/,''),box=$('#gr');
+  if(!q) return box.replaceChildren();
+  gt=setTimeout(async()=>{
+    const us=await findUsers(q);
+    box.replaceChildren();
+    if(!us.length) return box.append(el('div','none','Никого не нашли'));
+    us.forEach(d=>{
+      const u=d.data();
+      box.append(item(u.username,'ID '+u.bobosId,'',false,()=>{
+        if(Object.keys(gSel).length<49){gSel[d.id]=u.username;gChips()}
+        $('#gq').value='';box.replaceChildren();
+      },0,u.avatar));
+    });
+  },250);
+};
+$('#gf').onsubmit=async e=>{
+  e.preventDefault();
+  const t=$('#gt').value.trim(),ids=Object.keys(gSel),er=$('#gerr');
+  if(!t) return er.textContent='Введи название группы';
+  if(!ids.length) return er.textContent='Добавь хотя бы одного участника';
+  const ref=doc(collection(db,'chats')),members=[me.uid,...ids],names={[me.uid]:me.username,...gSel};
+  try{
+    await setDoc(ref,{type:'group',title:t,owner:me.uid,members,names,
+      lastText:'Группа создана',lastFrom:me.username,lastUid:me.uid,lastTs:serverTimestamp()});
+    $('#gd').close();
+    openChat(ref.id,t,{members,names,group:true,title:t},true);
+  }catch(x){console.error(x);er.textContent='Не вышло: '+(x.code||x.message)}
+};
+$('#hd').onclick=async e=>{
+  if(e.target.closest('#back')||!cur?.meta?.group) return;
+  $('#git').textContent=cur.title;
+  const box=$('#gil');box.replaceChildren();
+  await Promise.all(cur.meta.members.map(loadUser));
+  cur.meta.members.forEach(uid=>box.append(item(cur.meta.names[uid]||'?',uid===me.uid?'это ты':'',' ',false,()=>{},0,ucd[uid]?.avatar)));
+  $('#gi').showModal();
+};
+
+/* ---------- старт ---------- */
+onAuthStateChanged(auth,async u=>{
+  unChats&&unChats();unMsgs&&unMsgs();
+  if(!u){
+    me=null;cur=null;unread={};badge();
+    $('#app').classList.add('hide');$('#auth').classList.remove('hide');
+    return;
+  }
+  let p;
+  try{p=await ensureProfile(u)}catch(x){console.error(x);$('#err').textContent='Не удалось загрузить профиль: '+(x.code||x.message);signOut(auth);return}
+  me={uid:u.uid,username:p.username,id:p.bobosId,trusted:!!p.trusted,avatar:p.avatar||null};
+  ucd[u.uid]=p;
+  $('#auth').classList.add('hide');$('#app').classList.remove('hide');
+  $('#me').textContent='@'+me.username;
+  $('#ad').classList.toggle('hide',me.id!==ADMIN);
+
+  let first=true;
+  unChats=onSnapshot(query(collection(db,'chats'),where('members','array-contains',me.uid)),s=>{
+    chats=s.docs.map(d=>({id:d.id,...d.data()}));
+    const need=chats.filter(c=>c.type!=='group').map(c=>c.members.find(x=>x!==me.uid)).filter(x=>x&&!ucd[x]);
+    if(need.length) Promise.all(need.map(loadUser)).then(()=>{if(!$('#q').value)renderList()});
+    if(!first) s.docChanges().forEach(ch=>{
+      const d=ch.doc.data();
+      if(ch.type!=='removed'&&d.lastUid&&d.lastUid!==me.uid&&!ch.doc.metadata.hasPendingWrites) notify(ch.doc.id,(d.type==='group'?d.title+' · ':'')+(d.lastFrom||'bobos'),d.lastText||'');
+    });
+    first=false;
+    if(!$('#q').value) renderList();
+  },console.error);
+
+  emptyView();
+});
+</script>
+</body>
+</html>
